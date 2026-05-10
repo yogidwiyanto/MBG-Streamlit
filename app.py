@@ -165,6 +165,47 @@ st.markdown("""
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
         border: 1px solid #f3f4f6;
     }
+
+    /* Sembunyikan teks instruksi & tombol default file uploader Streamlit */
+    [data-testid="stFileUploader"] section > button {
+        display: none !important;
+    }
+    [data-testid="stFileUploader"] section > div:first-child {
+        display: none !important;
+    }
+    [data-testid="stFileUploaderDropzone"] {
+        border: none !important;
+        padding: 0 !important;
+        background: transparent !important;
+        min-height: unset !important;
+    }
+
+    /* Custom upload box */
+    .upload-box {
+        border: 2px dashed #10B981;
+        border-radius: 16px;
+        padding: 36px 20px;
+        text-align: center;
+        background: #f0fdf4;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: background 0.2s, border-color 0.2s;
+    }
+    .upload-box:hover {
+        background: #d1fae5;
+        border-color: #059669;
+    }
+    .upload-box h4 {
+        margin: 0 0 6px 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #065f46;
+    }
+    .upload-box p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #6B7280;
+    }
     
     .footer-text {
         text-align: center;
@@ -401,8 +442,14 @@ if mode == "Upload Gambar":
     with col_upload:
         tab_galeri, tab_kamera = st.tabs(["📁 Dari Galeri", "📷 Kamera"])
         with tab_galeri:
+            st.markdown("""
+            <div class="upload-box">
+                <h4>📤 Upload Gambar Makanan</h4>
+                <p>Drag &amp; drop atau klik untuk pilih gambar</p>
+            </div>
+            """, unsafe_allow_html=True)
             uploaded_file = st.file_uploader(
-                "Pilih gambar makanan",
+                "",
                 type=["jpg", "jpeg", "png", "webp"],
                 label_visibility="collapsed"
             )

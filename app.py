@@ -377,41 +377,45 @@ with col_status:
 # ── Main Content Area ────────────────────────────────────────
 st.markdown("<br>", unsafe_allow_html=True)
 
-col_text, col_action = st.columns([1.2, 1])
+# Hero text — full width
+st.markdown("""
+    <div class="main-heading">
+        Deteksi Makanan Bergizi Gratis(MBG) &<br>
+        <span>Estimasi Nutrisi AI</span>
+    </div>
+    <div class="sub-heading">
+        Mendukung Program Makan Bergizi Gratis (MBG) melalui deteksi otomatis jenis makanan dan estimasi kandungan nutrisi berbasis AI.
+    </div>
+    <div class="feature-list">
+        <div class="feature-item">⚡ Deteksi Instan</div>
+        <div class="feature-item">🎯 27 Jenis Makanan</div>
+        <div class="feature-item">📊 Estimasi Nutrisi</div>
+    </div>
+""", unsafe_allow_html=True)
 
-with col_text:
-    st.markdown("""
-        <div class="main-heading">
-            Deteksi Makanan Bergizi Gratis(MBG) &<br>
-            <span>Estimasi Nutrisi AI</span>
-        </div>
-        <div class="sub-heading">
-            Mendukung Program Makan Bergizi Gratis (MBG) melalui deteksi otomatis jenis makanan dan estimasi kandungan nutrisi berbasis AI.
-        </div>
-        <div class="feature-list">
-            <div class="feature-item">⚡ Deteksi Instan</div>
-            <div class="feature-item">🎯 27 Jenis Makanan</div>
-            <div class="feature-item">📊 Estimasi Nutrisi</div>
-        </div>
-    """, unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
 
-with col_action:
-    if mode == "Upload Gambar":
-        tab_galeri, tab_kamera = st.tabs(["📁 Dari Galeri", "Kamera"])
+# Upload / Kamera — full width dengan kolom yang lebih lapang
+if mode == "Upload Gambar":
+    col_upload, col_pad = st.columns([2, 1])
+    with col_upload:
+        tab_galeri, tab_kamera = st.tabs(["📁 Dari Galeri", "📷 Kamera"])
         with tab_galeri:
             uploaded_file = st.file_uploader(
-                "Drag & drop foto makanan (JPG, PNG, WEBP — Max 10MB)",
+                "Pilih gambar makanan",
                 type=["jpg", "jpeg", "png", "webp"],
                 label_visibility="collapsed"
             )
-            st.caption("Format didukung: JPG, PNG, WEBP — Maks 10MB")
+            st.caption("Format didukung: JPG, PNG, WEBP — Maks 200MB")
         with tab_kamera:
-            st.caption("Arahkan kamera ke makanan")
+            st.caption("Arahkan kamera ke makanan, lalu tekan jepret.")
             camera_photo = st.camera_input(
                 "Jepret makanan",
                 label_visibility="collapsed"
             )
-    else:
+else:
+    col_cam_ctrl, col_pad = st.columns([2, 1])
+    with col_cam_ctrl:
         st.markdown("### 📷 Live Stream Camera")
         run_camera = st.checkbox("Mulai Kamera Real-Time", key="run_cam")
         st.caption("Pastikan memberikan izin akses kamera (localhost).")

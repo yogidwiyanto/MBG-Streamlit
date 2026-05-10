@@ -119,17 +119,19 @@ st.markdown("""
     div[data-testid="stMetric"] {
         background: white;
         border: 1px solid #f3f4f6;
-        border-radius: 12px;
-        padding: 1rem;
+        border-radius: 10px;
+        padding: 0.55rem 0.7rem;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     }
     div[data-testid="stMetric"] label {
         color: #6b7280 !important;
         font-weight: 500;
+        font-size: 0.72rem !important;
     }
     div[data-testid="stMetric"] [data-testid="stMetricValue"] {
         color: #111827 !important;
         font-weight: 700;
+        font-size: 1rem !important;
     }
 
     .food-tag {
@@ -180,6 +182,40 @@ st.markdown("""
         justify-content: center;
         gap: 1rem;
     }
+
+    /* Adequacy / Kelayakan Nutrisi */
+    .adequacy-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        margin-top: 1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        border: 1px solid #f3f4f6;
+    }
+    .adequacy-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .adequacy-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        padding: 0.6rem 0.8rem;
+        border-radius: 10px;
+        margin-bottom: 0.45rem;
+        font-size: 0.88rem;
+        line-height: 1.5;
+    }
+    .adequacy-item.good  { background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d; }
+    .adequacy-item.warning { background: #fffbeb; border: 1px solid #fde68a; color: #78350f; }
+    .adequacy-item.bad  { background: #fef2f2; border: 1px solid #fecaca; color: #7f1d1d; }
+    .adequacy-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .adequacy-text strong { font-weight: 700; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -235,6 +271,10 @@ def build_nutrition_table(detected_items):
 
     return pd.DataFrame(rows) if rows else None
 
+# AKG harian dewasa rata-rata (referensi Indonesia)
+DAILY_REF = {"cal": 2150, "protein": 60, "carbs": 325, "fat": 65, "fiber": 30}
+
+
 def show_nutrition_summary(df_nutrition):
     """Display nutrition summary metrics."""
     total_energi = (df_nutrition["Energi (kkal)"] * df_nutrition["Jumlah"]).sum()
@@ -253,6 +293,72 @@ def show_nutrition_summary(df_nutrition):
     c5.metric("🥬 Serat", f"{total_serat:.1f} g")
 
     st.info("⚠️ Catatan: Estimasi nutrisi dihitung berdasarkan data TKPI 2017 dengan asumsi 1 porsi = 100 gram per makanan yang terdeteksi.")
+
+
+def show_adequacy(df_nutrition):
+    """Tampilkan kesimpulan kelayakan nutrisi berdasarkan AKG harian."""
+    total_energi = (df_nutrition["Energi (kkal)"] * df_nutrition["Jumlah"]).sum()
+    total_protein = (df_nutrition["Protein (g)"] * df_nutrition["Jumlah"]).sum()
+    total_lemak = (df_nutrition["Lemak (g)"] * df_nutrition["Jumlah"]).sum()
+    total_serat = (df_nutrition["Serat (g)"] * df_nutrition["Jumlah"]).sum()
+
+    items = []
+
+    # Kalori
+    cal_pct = (total_energi / DAILY_REF["cal"]) * 100
+    if cal_pct < 15:
+        items.append({"level": "warning", "icon": "⚠️",
+            "text": f"<strong>Kalori rendah</strong> — Makanan ini hanya menyumbang {cal_pct:.0f}% kebutuhan harian ({total_energi:.0f} dari {DAILY_REF['cal']} kkal). Pertimbangkan menambah porsi atau sumber kalori lain."})
+    elif cal_pct <= 40:
+        items.append({"level": "good", "icon": "✅",
+            "text": f"<strong>Kalori cukup</strong> — Menyumbang {cal_pct:.0f}% kebutuhan harian ({total_energi:.0f} kkal). Sesuai untuk satu kali makan."})
+    else:
+        items.append({"level": "bad", "icon": "🔴",
+            "text": f"<strong>Kalori tinggi</strong> — Menyumbang {cal_pct:.0f}% kebutuhan harian ({total_energi:.0f} kkal). Perhatikan asupan makanan lain di hari ini."})
+
+    # Protein
+    pro_pct = (total_protein / DAILY_REF["protein"]) * 100
+    if pro_pct < 10:
+        items.append({"level": "warning", "icon": "⚠️",
+            "text": f"<strong>Protein rendah</strong> ({total_protein:.1f}g, {pro_pct:.0f}% AKG). Tambahkan sumber protein seperti telur, daging, atau tempe."})
+    elif pro_pct <= 40:
+        items.append({"level": "good", "icon": "✅",
+            "text": f"<strong>Protein baik</strong> ({total_protein:.1f}g, {pro_pct:.0f}% AKG). Asupan protein memadai untuk satu kali makan."})
+    else:
+        items.append({"level": "good", "icon": "💪",
+            "text": f"<strong>Protein tinggi</strong> ({total_protein:.1f}g, {pro_pct:.0f}% AKG). Sangat baik untuk pembentukan otot."})
+
+    # Serat
+    fib_pct = (total_serat / DAILY_REF["fiber"]) * 100
+    if fib_pct < 5:
+        items.append({"level": "warning", "icon": "⚠️",
+            "text": f"<strong>Serat sangat rendah</strong> ({total_serat:.1f}g). Tambahkan sayur dan buah untuk memenuhi kebutuhan serat harian."})
+    elif fib_pct <= 30:
+        items.append({"level": "good", "icon": "✅",
+            "text": f"<strong>Serat cukup</strong> ({total_serat:.1f}g, {fib_pct:.0f}% AKG)."})
+    else:
+        items.append({"level": "good", "icon": "🥦",
+            "text": f"<strong>Serat tinggi</strong> ({total_serat:.1f}g, {fib_pct:.0f}% AKG). Sangat baik untuk pencernaan."})
+
+    # Lemak
+    fat_pct = (total_lemak / DAILY_REF["fat"]) * 100
+    if fat_pct > 40:
+        items.append({"level": "bad", "icon": "🔴",
+            "text": f"<strong>Lemak tinggi</strong> ({total_lemak:.1f}g, {fat_pct:.0f}% AKG). Pertimbangkan mengurangi makanan berlemak di sisa hari ini."})
+
+    # Render
+    items_html = "".join(
+        f'<div class="adequacy-item {i["level"]}">'
+        f'<span class="adequacy-icon">{i["icon"]}</span>'
+        f'<div class="adequacy-text">{i["text"]}</div></div>'
+        for i in items
+    )
+    st.markdown(
+        f'<div class="adequacy-card">'
+        f'<div class="adequacy-title">🩺 Kesimpulan Kelayakan Nutrisi</div>'
+        f'{items_html}</div>',
+        unsafe_allow_html=True
+    )
 
 
 # ── Top Navigation / Header ──────────────────────────────────
@@ -291,10 +397,20 @@ with col_text:
 
 with col_action:
     if mode == "Upload Gambar":
-        uploaded_file = st.file_uploader(
-            "Drag & drop foto makanan (JPG, PNG, WEBP — Max 10MB)",
-            type=["jpg", "jpeg", "png", "webp"]
-        )
+        tab_galeri, tab_kamera = st.tabs(["📁 Dari Galeri", "Kamera"])
+        with tab_galeri:
+            uploaded_file = st.file_uploader(
+                "Drag & drop foto makanan (JPG, PNG, WEBP — Max 10MB)",
+                type=["jpg", "jpeg", "png", "webp"],
+                label_visibility="collapsed"
+            )
+            st.caption("Format didukung: JPG, PNG, WEBP — Maks 10MB")
+        with tab_kamera:
+            st.caption("Arahkan kamera ke makanan")
+            camera_photo = st.camera_input(
+                "Jepret makanan",
+                label_visibility="collapsed"
+            )
     else:
         st.markdown("### 📷 Live Stream Camera")
         run_camera = st.checkbox("Mulai Kamera Real-Time", key="run_cam")
@@ -302,10 +418,25 @@ with col_action:
 
 
 # ── Logic for Modes ──────────────────────────────────────────
-if mode == "Upload Gambar" and 'uploaded_file' in locals() and uploaded_file is not None:
+# Inisialisasi default agar tidak error jika tab belum dirender
+if "uploaded_file" not in dir():
+    uploaded_file = None
+if "camera_photo" not in dir():
+    camera_photo = None
+
+# Tentukan sumber gambar aktif: kamera diprioritaskan jika baru dijepret,
+# galeri diprioritaskan jika tidak ada foto kamera
+_active_file = None
+if mode == "Upload Gambar":
+    if camera_photo is not None:
+        _active_file = camera_photo
+    elif uploaded_file is not None:
+        _active_file = uploaded_file
+
+if mode == "Upload Gambar" and _active_file is not None:
     st.markdown("---")
-    
-    file_bytes = uploaded_file.read()
+
+    file_bytes = _active_file.read()
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".jpg")
     tmp.write(file_bytes)
     tmp.close()
@@ -332,7 +463,7 @@ if mode == "Upload Gambar" and 'uploaded_file' in locals() and uploaded_file is 
     plotted = cv2.cvtColor(plotted, cv2.COLOR_BGR2RGB)
     detected_items = get_detected_classes(results)
 
-    col_img, col_info = st.columns([1, 1])
+    col_img, col_info = st.columns([0.7, 1.3])
 
     with col_img:
         st.markdown("#### 📸 Hasil Deteksi")
@@ -351,14 +482,13 @@ if mode == "Upload Gambar" and 'uploaded_file' in locals() and uploaded_file is 
             df_nutrition = build_nutrition_table(detected_items)
             if df_nutrition is not None:
                 st.dataframe(df_nutrition, use_container_width=True, hide_index=True)
+                # Estimasi Total Nutrisi (dipindah ke bawah tabel)
+                st.markdown("<br>", unsafe_allow_html=True)
+                show_nutrition_summary(df_nutrition)
+                # Kesimpulan Kelayakan Nutrisi
+                show_adequacy(df_nutrition)
         else:
             st.info("Tidak ada makanan yang terdeteksi pada gambar.")
-
-    if detected_items:
-        df_nutrition = build_nutrition_table(detected_items)
-        if df_nutrition is not None:
-            st.markdown("---")
-            show_nutrition_summary(df_nutrition)
 
 elif mode == "Streaming Real-Time" and run_camera:
     st.markdown("---")

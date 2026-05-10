@@ -401,8 +401,22 @@ if mode == "Upload Gambar":
     with col_upload:
         tab_galeri, tab_kamera = st.tabs(["📁 Dari Galeri", "📷 Kamera"])
         with tab_galeri:
+            # Sembunyikan label dengan CSS inline sebelum uploader
+            st.markdown("""
+                <style>
+                /* Sembunyikan semua label file uploader */
+                .stFileUploader > label,
+                .stFileUploader [data-testid="stWidgetLabel"] {
+                    display: none !important;
+                    height: 0 !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+                </style>
+            """, unsafe_allow_html=True)
+            
             uploaded_file = st.file_uploader(
-                "Pilih gambar makanan",
+                "x",  # Placeholder tidak penting karena disembunyikan
                 type=["jpg", "jpeg", "png", "webp"],
                 label_visibility="collapsed"
             )

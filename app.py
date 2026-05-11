@@ -422,11 +422,31 @@ if mode == "Upload Gambar":
             )
             st.caption("Format didukung: JPG, PNG, WEBP — Maks 200MB")
         with tab_kamera:
-            st.caption("Arahkan kamera ke makanan, lalu tekan jepret.")
-            camera_photo = st.camera_input(
-                "Jepret makanan",
-                label_visibility="collapsed"
+            st.markdown("""
+                <div style="
+                    background: #f0fdf4;
+                    border: 2px dashed #10B981;
+                    border-radius: 14px;
+                    padding: 28px 20px;
+                    text-align: center;
+                    margin-bottom: 8px;
+                ">
+                    <div style="font-size: 2rem; margin-bottom: 8px;">📷</div>
+                    <div style="font-weight: 700; color: #065f46; font-size: 1rem; margin-bottom: 4px;">
+                        Ambil Foto Makanan
+                    </div>
+                    <div style="font-size: 0.85rem; color: #6B7280;">
+                        Klik tombol di bawah → pilih <strong>Ambil Foto</strong> / <strong>Camera</strong> untuk membuka kamera
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+            camera_photo = st.file_uploader(
+                "Ambil foto makanan",
+                type=["jpg", "jpeg", "png", "webp"],
+                label_visibility="collapsed",
+                key="camera_upload"
             )
+            st.caption("📱 Di perangkat mobile: tap Browse → pilih 'Ambil Foto' untuk membuka kamera")
 else:
     col_cam_ctrl, col_pad = st.columns([2, 1])
     with col_cam_ctrl:

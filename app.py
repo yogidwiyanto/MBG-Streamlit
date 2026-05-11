@@ -412,15 +412,22 @@ if mode == "Upload Gambar":
                     margin: 0 !important;
                     padding: 0 !important;
                 }
-                /* Sembunyikan teks instruksi dropzone (penyebab tulisan double) */
-                [data-testid="stFileUploaderDropzoneInstructions"] > div > span {
+                /* Sembunyikan SEMUA teks instruksi di dalam dropzone */
+                [data-testid="stFileUploaderDropzoneInstructions"] {
+                    visibility: hidden !important;
+                    height: 0 !important;
+                    min-height: 0 !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    overflow: hidden !important;
+                }
+                [data-testid="stFileUploaderDropzoneInstructions"] * {
                     display: none !important;
                 }
-                [data-testid="stFileUploaderDropzoneInstructions"] div::before {
-                    content: "Browse files" !important;
-                    display: inline !important;
-                }
-                [data-testid="stFileUploaderDropzoneInstructions"] small {
+                /* Sembunyikan icon material "upload" */
+                [data-testid="stFileUploaderDropzone"] span[data-testid="stIconMaterial"],
+                [data-testid="stFileUploaderDropzone"] .material-icons,
+                [data-testid="stFileUploaderDropzone"] span:has(> svg) {
                     display: none !important;
                 }
                 </style>

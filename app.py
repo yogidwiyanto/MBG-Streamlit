@@ -401,16 +401,27 @@ if mode == "Upload Gambar":
     with col_upload:
         tab_galeri, tab_kamera = st.tabs(["📁 Dari Galeri", "📷 Kamera"])
         with tab_galeri:
-            # Sembunyikan label dengan CSS inline sebelum uploader
+            # Sembunyikan teks double di file uploader
             st.markdown("""
                 <style>
-                /* Sembunyikan semua label file uploader */
+                /* Sembunyikan label widget */
                 .stFileUploader > label,
                 .stFileUploader [data-testid="stWidgetLabel"] {
                     display: none !important;
                     height: 0 !important;
                     margin: 0 !important;
                     padding: 0 !important;
+                }
+                /* Sembunyikan teks instruksi dropzone (penyebab tulisan double) */
+                [data-testid="stFileUploaderDropzoneInstructions"] > div > span {
+                    display: none !important;
+                }
+                [data-testid="stFileUploaderDropzoneInstructions"] div::before {
+                    content: "Browse files" !important;
+                    display: inline !important;
+                }
+                [data-testid="stFileUploaderDropzoneInstructions"] small {
+                    display: none !important;
                 }
                 </style>
             """, unsafe_allow_html=True)

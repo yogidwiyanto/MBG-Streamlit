@@ -99,6 +99,65 @@ st.markdown("""
         max-width: 90%;
     }
 
+    /* ── Responsive ─────────────────────────── */
+    @media (max-width: 768px) {
+        .main-heading {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+        }
+        .sub-heading {
+            font-size: 0.95rem;
+            max-width: 100%;
+            margin-bottom: 1.5rem;
+        }
+        .feature-list {
+            gap: 0.75rem;
+        }
+        .feature-item {
+            font-size: 0.82rem;
+        }
+        .logo {
+            font-size: 1.2rem;
+        }
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+        }
+        div[data-testid="stMetric"] {
+            padding: 0.4rem 0.5rem;
+        }
+        div[data-testid="stMetric"] label {
+            font-size: 0.65rem !important;
+        }
+        div[data-testid="stMetric"] [data-testid="stMetricValue"] {
+            font-size: 0.85rem !important;
+        }
+        .nutrition-header {
+            font-size: 1rem;
+        }
+        .adequacy-card {
+            padding: 1rem;
+        }
+        .adequacy-item {
+            font-size: 0.8rem;
+            padding: 0.5rem 0.6rem;
+        }
+        .footer-text {
+            margin-top: 2rem;
+            font-size: 0.78rem;
+        }
+    }
+
+    /* Tablet portrait */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .main-heading {
+            font-size: 2.4rem;
+        }
+        .sub-heading {
+            font-size: 1rem;
+        }
+    }
+
     .feature-list {
         display: flex;
         gap: 1.5rem;
@@ -157,14 +216,7 @@ st.markdown("""
         padding-bottom: 0.25rem;
     }
 
-    /* Uploader styling override to look more like the box in the image */
-    .stFileUploader {
-        background: white;
-        border-radius: 16px;
-        padding: 1.5rem;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-        border: 1px solid #f3f4f6;
-    }
+
     
     .footer-text {
         text-align: center;
@@ -395,76 +447,14 @@ st.markdown("""
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Upload / Kamera — full width dengan kolom yang lebih lapang
+# Upload file — satu file_uploader saja (browser mobile otomatis beri opsi galeri/kamera)
 if mode == "Upload Gambar":
-    col_upload, col_pad = st.columns([2, 1])
-    with col_upload:
-        tab_galeri, tab_kamera = st.tabs(["📁 Dari Galeri", "📷 Kamera"])
-        with tab_galeri:
-            # Sembunyikan teks double di file uploader
-            st.markdown("""
-                <style>
-                /* Sembunyikan label widget */
-                .stFileUploader > label,
-                .stFileUploader [data-testid="stWidgetLabel"] {
-                    display: none !important;
-                    height: 0 !important;
-                    margin: 0 !important;
-                    padding: 0 !important;
-                }
-                /* Sembunyikan SEMUA teks instruksi di dalam dropzone */
-                [data-testid="stFileUploaderDropzoneInstructions"] {
-                    visibility: hidden !important;
-                    height: 0 !important;
-                    min-height: 0 !important;
-                    padding: 0 !important;
-                    margin: 0 !important;
-                    overflow: hidden !important;
-                }
-                [data-testid="stFileUploaderDropzoneInstructions"] * {
-                    display: none !important;
-                }
-                /* Sembunyikan icon material "upload" */
-                [data-testid="stFileUploaderDropzone"] span[data-testid="stIconMaterial"],
-                [data-testid="stFileUploaderDropzone"] .material-icons,
-                [data-testid="stFileUploaderDropzone"] span:has(> svg) {
-                    display: none !important;
-                }
-                </style>
-            """, unsafe_allow_html=True)
-            
-            uploaded_file = st.file_uploader(
-                "x",  # Placeholder tidak penting karena disembunyikan
-                type=["jpg", "jpeg", "png", "webp"],
-                label_visibility="collapsed"
-            )
-            st.caption("Format didukung: JPG, PNG, WEBP — Maks 200MB")
-        with tab_kamera:
-            st.markdown("""
-                <div style="
-                    background: #f0fdf4;
-                    border: 2px dashed #10B981;
-                    border-radius: 14px;
-                    padding: 28px 20px;
-                    text-align: center;
-                    margin-bottom: 8px;
-                ">
-                    <div style="font-size: 2rem; margin-bottom: 8px;">📷</div>
-                    <div style="font-weight: 700; color: #065f46; font-size: 1rem; margin-bottom: 4px;">
-                        Ambil Foto Makanan
-                    </div>
-                    <div style="font-size: 0.85rem; color: #6B7280;">
-                        Klik tombol di bawah → pilih <strong>Ambil Foto</strong> / <strong>Camera</strong> untuk membuka kamera
-                    </div>
-                </div>
-            """, unsafe_allow_html=True)
-            camera_photo = st.file_uploader(
-                "Ambil foto makanan",
-                type=["jpg", "jpeg", "png", "webp"],
-                label_visibility="collapsed",
-                key="camera_upload"
-            )
-            st.caption("📱 Di perangkat mobile: tap Browse → pilih 'Ambil Foto' untuk membuka kamera")
+    uploaded_file = st.file_uploader(
+        "Upload gambar makanan",
+        type=["jpg", "jpeg", "png", "webp"],
+        label_visibility="collapsed"
+    )
+    st.caption("Format didukung: JPG, PNG, WEBP — Maks 200MB · Di HP: tap Browse → pilih Galeri atau Kamera")
 else:
     col_cam_ctrl, col_pad = st.columns([2, 1])
     with col_cam_ctrl:
@@ -474,25 +464,13 @@ else:
 
 
 # ── Logic for Modes ──────────────────────────────────────────
-# Inisialisasi default agar tidak error jika tab belum dirender
 if "uploaded_file" not in dir():
     uploaded_file = None
-if "camera_photo" not in dir():
-    camera_photo = None
 
-# Tentukan sumber gambar aktif: kamera diprioritaskan jika baru dijepret,
-# galeri diprioritaskan jika tidak ada foto kamera
-_active_file = None
-if mode == "Upload Gambar":
-    if camera_photo is not None:
-        _active_file = camera_photo
-    elif uploaded_file is not None:
-        _active_file = uploaded_file
-
-if mode == "Upload Gambar" and _active_file is not None:
+if mode == "Upload Gambar" and uploaded_file is not None:
     st.markdown("---")
 
-    file_bytes = _active_file.read()
+    file_bytes = uploaded_file.read()
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".jpg")
     tmp.write(file_bytes)
     tmp.close()

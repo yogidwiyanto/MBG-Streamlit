@@ -5,10 +5,15 @@ import cv2
 import pandas as pd
 import tempfile
 import numpy as np
-import queue
-from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration
-import av
 import torch
+
+# ── Page Config — HARUS dipanggil pertama sebelum command Streamlit lain ──
+st.set_page_config(
+    page_title="MBG Food.",
+    page_icon="🍽️",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 
 # Fix Streamlit watcher bug dengan PyTorch
 try:
@@ -16,19 +21,7 @@ try:
 except Exception:
     pass
 
-@st.cache_resource
-def get_webrtc_queue():
-    return queue.Queue(maxsize=1)
 
-webrtc_queue = get_webrtc_queue()
-
-# ── Page Config ──────────────────────────────────────────────
-st.set_page_config(
-    page_title="MBG Food.",
-    page_icon="🍽️",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
 
 # ── Custom CSS ───────────────────────────────────────────────
 st.markdown("""
@@ -228,12 +221,7 @@ st.markdown("""
         padding-bottom: 2rem;
     }
 
-    /* Center Radio Buttons for Top Nav */
-    div.stRadio > div[role="radiogroup"] {
-        flex-direction: row;
-        justify-content: center;
-        gap: 1rem;
-    }
+
 
     /* Adequacy / Kelayakan Nutrisi */
     .adequacy-card {
@@ -275,7 +263,7 @@ st.markdown("""
 # ── Load Model & Data ────────────────────────────────────────
 @st.cache_resource
 def load_model():
-    return YOLO("best.pt")
+    return YOLO("best_2.pt")
 
 @st.cache_data
 def load_tkpi():
@@ -344,7 +332,7 @@ def show_nutrition_summary(df_nutrition):
     c4.metric("🍚 Karbohidrat", f"{total_karbo:.1f} g")
     c5.metric("🥬 Serat", f"{total_serat:.1f} g")
 
-    st.info("⚠️ Catatan: Estimasi nutrisi dihitung berdasarkan data TKPI 2017 dengan asumsi 1 porsi = 100 gram per makanan yang terdeteksi.")
+    st.info("⚠️ Catatan: Estimasi nutrisi dihitung berdasarkan data TKPI 2020 dengan asumsi 1 porsi = 100 gram per makanan yang terdeteksi.")
 
 
 def show_adequacy(df_nutrition):
@@ -414,13 +402,10 @@ def show_adequacy(df_nutrition):
 
 
 # ── Top Navigation / Header ──────────────────────────────────
-col_logo, col_nav, col_status = st.columns([1, 2, 1])
+col_logo, col_status = st.columns([1, 1])
 
 with col_logo:
     st.markdown('<div class="logo">🍽️ MBG Food.</div>', unsafe_allow_html=True)
-
-with col_nav:
-    mode = st.radio("Navigasi", ["Upload Gambar", "Streaming Real-Time"], label_visibility="collapsed")
 
 with col_status:
     st.markdown('<div style="display: flex; justify-content: flex-end;"><div class="status-badge">🟢 YOLOv11 Ready</div></div>', unsafe_allow_html=True)
@@ -440,34 +425,22 @@ st.markdown("""
     </div>
     <div class="feature-list">
         <div class="feature-item">⚡ Deteksi Instan</div>
-        <div class="feature-item">🎯 27 Jenis Makanan</div>
+        <div class="feature-item">🎯 36 Jenis Makanan</div>
         <div class="feature-item">📊 Estimasi Nutrisi</div>
     </div>
 """, unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Upload file — satu file_uploader saja (browser mobile otomatis beri opsi galeri/kamera)
-if mode == "Upload Gambar":
-    uploaded_file = st.file_uploader(
-        "Upload gambar makanan",
-        type=["jpg", "jpeg", "png", "webp"],
-        label_visibility="collapsed"
-    )
-    st.caption("Format didukung: JPG, PNG, WEBP — Maks 200MB · Di HP: tap Browse → pilih Galeri atau Kamera")
-else:
-    col_cam_ctrl, col_pad = st.columns([2, 1])
-    with col_cam_ctrl:
-        st.markdown("### 📷 Live Stream Camera")
-        run_camera = st.checkbox("Mulai Kamera Real-Time", key="run_cam")
-        st.caption("Pastikan memberikan izin akses kamera (localhost).")
+# Upload file
+uploaded_file = st.file_uploader(
+    "Upload gambar makanan",
+    type=["jpg", "jpeg", "png", "webp"],
+    label_visibility="collapsed"
+)
+st.caption("Format didukung: JPG, PNG, WEBP — Maks 200MB · Di HP: tap Browse → pilih Galeri atau Kamera")
 
-
-# ── Logic for Modes ──────────────────────────────────────────
-if "uploaded_file" not in dir():
-    uploaded_file = None
-
-if mode == "Upload Gambar" and uploaded_file is not None:
+if uploaded_file is not None:
     st.markdown("---")
 
     file_bytes = uploaded_file.read()
@@ -493,7 +466,7 @@ if mode == "Upload Gambar" and uploaded_file is not None:
         if os.path.exists(file_path):
             os.unlink(file_path)
 
-    plotted = results[0].plot()
+    plotted = results[0].plot(conf=False)
     plotted = cv2.cvtColor(plotted, cv2.COLOR_BGR2RGB)
     detected_items = get_detected_classes(results)
 
@@ -508,14 +481,14 @@ if mode == "Upload Gambar" and uploaded_file is not None:
         if detected_items:
             tags_html = ""
             for item in detected_items:
-                tags_html += f'<span class="food-tag">{item["nama"]} ({item["confidence"]:.0%})</span>'
+                tags_html += f'<span class="food-tag">{item["nama"]}</span>'
             st.markdown(tags_html, unsafe_allow_html=True)
             
             st.markdown("<br>", unsafe_allow_html=True)
             st.markdown('<div class="nutrition-header">📊 Informasi Nutrisi per 100g</div>', unsafe_allow_html=True)
             df_nutrition = build_nutrition_table(detected_items)
             if df_nutrition is not None:
-                st.dataframe(df_nutrition, use_container_width=True, hide_index=True)
+                st.dataframe(df_nutrition.drop(columns=["Jumlah"]), use_container_width=True, hide_index=True)
                 # Estimasi Total Nutrisi (dipindah ke bawah tabel)
                 st.markdown("<br>", unsafe_allow_html=True)
                 show_nutrition_summary(df_nutrition)
@@ -524,80 +497,11 @@ if mode == "Upload Gambar" and uploaded_file is not None:
         else:
             st.info("Tidak ada makanan yang terdeteksi pada gambar.")
 
-elif mode == "Streaming Real-Time" and run_camera:
-    st.markdown("---")
-    
-    col_cam, col_res = st.columns([1, 1])
-    
-    with col_cam:
-        st.markdown("#### 📸 Live View WebRTC")
-        
-        def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
-            img = frame.to_ndarray(format="bgr24")
-            
-            # Prediksi YOLO (imgsz=480 untuk performa lebih stabil di server/real-time)
-            results = model.predict(source=img, conf=0.25, verbose=False, imgsz=480)
-            plotted = results[0].plot()
-            
-            # Ekstrak data yang terdeteksi
-            detected = []
-            for box in results[0].boxes:
-                cls_id = int(box.cls[0])
-                cls_name = results[0].names[cls_id]
-                conf = float(box.conf[0])
-                detected.append({"nama": cls_name, "confidence": conf})
-                
-            try:
-                # Masukkan ke antrean. Jika penuh, buang yang lama/abaikan agar UI tidak telat (backlog).
-                webrtc_queue.put_nowait(detected)
-            except queue.Full:
-                pass
-                
-            return av.VideoFrame.from_ndarray(plotted, format="bgr24")
-
-        webrtc_ctx = webrtc_streamer(
-            key="yolo-webrtc",
-            mode=WebRtcMode.SENDRECV,
-            rtc_configuration=RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}),
-            video_frame_callback=video_frame_callback,
-            media_stream_constraints={"video": {"facingMode": "environment"}, "audio": False},
-            async_processing=True,
-        )
-        
-    with col_res:
-        st.markdown("#### 🍴 Hasil Deteksi & Nutrisi")
-        INFO_WINDOW = st.empty()
-        
-    if webrtc_ctx.state.playing:
-        prev_detected_str = None
-        while True:
-            try:
-                # Ambil data terbaru dari antrean dengan timeout 0.5 detik
-                detected_items = webrtc_queue.get(timeout=0.5)
-                
-                # Buat representasi string untuk deteksi perubahan (agar tabel tidak render tiap frame)
-                current_detected_str = ",".join(sorted([item["nama"] for item in detected_items]))
-                
-                if current_detected_str != prev_detected_str:
-                    prev_detected_str = current_detected_str
-                    with INFO_WINDOW.container():
-                        if detected_items:
-                            tags_html = "".join([f'<span class="food-tag">{item["nama"]} ({item["confidence"]:.0%})</span>' for item in detected_items])
-                            st.markdown(tags_html, unsafe_allow_html=True)
-                            
-                            df_nutrition = build_nutrition_table(detected_items)
-                            if df_nutrition is not None:
-                                st.markdown('<div class="nutrition-header" style="margin-top: 15px;">📊 Nutrisi per 100g</div>', unsafe_allow_html=True)
-                                st.dataframe(df_nutrition, use_container_width=True, hide_index=True)
-                        else:
-                            st.info("Mencari makanan di depan kamera...")
-            except queue.Empty:
-                pass
 
 # ── Footer ───────────────────────────────────────────────────
 st.markdown("""
 <div class="footer-text">
     Sistem Deteksi Makanan & Estimasi Nutrisi — Powered by YOLOv11 & ONNX Runtime Web<br>
-    Data nutrisi berdasarkan TKPI 2017 (Tabel Komposisi Pangan Indonesia)
+    Data nutrisi berdasarkan TKPI 2020 (Tabel Komposisi Pangan Indonesia)
 </div>
 """, unsafe_allow_html=True)

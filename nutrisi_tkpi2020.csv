@@ -1,0 +1,31 @@
+label_model,nama_pangan,energi_kkal,protein_g,lemak_g,karbohidrat_g,serat_g,porsi_acuan,sumber
+Anggur,Anggur hutan,30,0.5,0.2,6.8,1.2,100 gram,TKPI 2020
+Apel,Apel,58,0.3,0.4,14.9,2.6,100 gram,TKPI 2020
+Ayam Goreng,Ayam goreng kalasan,275,37.4,12.2,1.3,0.0,100 gram,TKPI 2020
+Daging_sapi,Daging sapi has dalam,207,18.8,14.0,0.0,0.0,100 gram,TKPI 2020
+Edamame,Kedelai muda (edamame),121,11.9,5.2,8.9,5.2,100 gram,USDA (tidak ada di TKPI 2020)
+Jagung,Jagung muda kuning,147,5.1,0.7,31.5,1.3,100 gram,TKPI 2020
+Jeruk,Jeruk manis,45,0.9,0.2,11.2,1.4,100 gram,TKPI 2020
+Kelengkeng,Kelengkeng,60,1.0,0.1,15.1,1.1,100 gram,Tidak ada di TKPI 2020 (sumber lain)
+Kentang,Kentang,62,2.1,0.2,13.5,0.5,100 gram,TKPI 2020
+Kurma,Kurma,284,2.5,0.4,75.0,6.7,100 gram,Tidak ada di TKPI 2020 (sumber lain)
+Melon,Melon,37,0.6,0.4,7.8,1.0,100 gram,TKPI 2020
+Mie,Mie instan goreng,458,7.9,19.7,63.6,0.9,100 gram,TKPI 2020
+Mix_Vegetables,Sayur campuran (rerata),25,1.5,0.2,4.8,1.8,100 gram,Rerata TKPI 2020 (Kacang Panjang+Labu Siam+Selada+Pakcoy)
+Nasi,Nasi putih,180,3.0,0.3,39.8,0.2,100 gram,TKPI 2020
+Pisang,Pisang ambon,108,1.0,0.8,24.3,1.9,100 gram,TKPI 2020
+Roti,Roti putih,248,8.0,1.2,50.0,9.1,100 gram,TKPI 2020
+Sayur_KacangPanjang,Kacang panjang,31,2.3,0.1,5.3,2.7,100 gram,TKPI 2020
+Sayur_Labu,Labu siam,30,0.6,0.1,6.7,6.2,100 gram,TKPI 2020
+Sayur_Pakcoy,Pakcoy,13,1.5,0.2,2.2,1.0,100 gram,Tidak ada di TKPI 2020 (sumber lain)
+Selada,Selada,18,1.2,0.2,2.9,1.8,100 gram,TKPI 2020
+Semangka,Semangka,28,0.5,0.2,6.9,0.4,100 gram,TKPI 2020
+Stroberi,Stroberi,32,0.7,0.3,7.7,2.0,100 gram,Tidak ada di TKPI 2020 (sumber lain)
+Susu,Susu sapi,61,3.2,3.5,4.3,0.0,100 gram,TKPI 2020
+Tahu,Tahu goreng,80,10.9,4.7,0.8,0.1,100 gram,TKPI 2020 (nilai tahu mentah; goreng belum tersedia terpisah)
+Telur Goreng,Telur goreng,196,13.6,15.3,0.8,0.0,100 gram,TKPI 2020
+Telur Rebus,Telur rebus,154,12.4,10.8,0.7,0.0,100 gram,TKPI 2020
+Tempe,Tempe goreng,350,24.5,26.6,10.4,4.2,100 gram,TKPI 2020
+Timun,Ketimun,8,0.2,0.2,1.4,0.3,100 gram,TKPI 2020
+Tomat,Tomat merah,24,1.3,0.5,4.7,1.5,100 gram,TKPI 2020
+kacang_polong,Kacang ercis,129,12.4,0.7,18.3,28.6,100 gram,TKPI 2020

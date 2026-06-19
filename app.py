@@ -52,9 +52,23 @@ def load_css() -> str:
 
 # Inisialisasi Model & Data ─
 
+import urllib.request
+
 @st.cache_resource
 def load_yolo_model() -> YOLO:
-    return YOLO("best_v6.pt")
+    model_path = "best_v6.pt"
+    # URL download dari GitHub Release kamu
+    model_url = "https://github.com/yogidwiyanto/MBG-Streamlit/releases/download/v1.0/best_v6.pt"
+    
+    if not os.path.exists(model_path):
+        with st.spinner("Mendownload model AI (sekitar 49MB), mohon tunggu..."):
+            try:
+                urllib.request.urlretrieve(model_url, model_path)
+            except Exception as e:
+                st.error(f"Gagal mendownload model: {e}")
+                st.stop()
+                
+    return YOLO(model_path)
 
 
 @st.cache_data

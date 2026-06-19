@@ -16,5 +16,9 @@ venv/
 ipynb/
 .ipynb_checkpoints/
 
-# Model files (upload manually via GitHub)
-*.pt
+# Model files (old models ignored)
+best.pt
+best_2.pt
+bestv5.pt
+best_v3.pt
+bestv8.pt

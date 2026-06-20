@@ -5,7 +5,6 @@ html, body, [class*="st-"] {
 }
 
 #MainMenu { visibility: hidden; }
-header    { visibility: hidden; }
 footer    { visibility: hidden; }
 
 .stApp {

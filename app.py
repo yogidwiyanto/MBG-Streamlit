@@ -150,7 +150,7 @@ def evaluate_nutrient(
         if pct < 20:
             return {"level": "warning", "icon": "!", "text": f"<strong>Kalori rendah</strong> — Menyumbang {pct:.0f}% AKG ({value:.0f} kkal) dan berada di bawah rentang referensi yang digunakan (20–35% AKG)."}
         if pct <= 35:
-            return {"level": "good",    "icon": "v", "text": f"<strong>Kalori memadai</strong> — Menyumbang {pct:.0f}% AKG ({value:.0f} kkal) berdasarkan nilai referensi yang digunakan."}
+            return {"level": "good",    "icon": "v", "text": f"<strong>Kalori ideal</strong> — Menyumbang {pct:.0f}% AKG ({value:.0f} kkal) berdasarkan nilai referensi yang digunakan."}
         return         {"level": "bad",     "icon": "!", "text": f"<strong>Kalori tinggi</strong> — Menyumbang {pct:.0f}% AKG ({value:.0f} kkal) dan berada di atas rentang referensi yang digunakan."}
 
     if key == "protein":

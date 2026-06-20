@@ -11,12 +11,6 @@ footer    { visibility: hidden; }
     background-color: #fafafa;
 }
 
-/* Sembunyikan tombol open/close sidebar agar selalu terbuka */
-[data-testid="collapsedControl"],
-[data-testid="stSidebarCollapseButton"] {
-    display: none !important;
-}
-
 /* Header */
 .top-bar {
     display: flex;

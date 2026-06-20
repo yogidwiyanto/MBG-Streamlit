@@ -11,6 +11,13 @@ footer    { visibility: hidden; }
     background-color: #fafafa;
 }
 
+/* Menyembunyikan tombol sidebar secara halus (transparan & tidak bisa diklik) */
+[data-testid="collapsedControl"],
+[data-testid="stSidebarCollapseButton"] {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
 /* Header */
 .top-bar {
     display: flex;
